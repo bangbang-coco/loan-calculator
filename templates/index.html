@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0">
+    <meta name="description" content="정부공인 대출 이자 계산기 - 원리금균등, 원금균등, 만기일시, 체증식 상환 방식 계산">
+    <meta name="keywords" content="대출계산기, 이자계산, 원리금균등상환, 원금균등상환, 만기일시상환, 체증식상환">
+    <meta name="theme-color" content="#1E3A8A">
+    <title>대출의 모든것 - 대출이 궁금하신가요? 잘 오셨습니다.</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🏛️ 대출의 모든것</h1>
+                    <p class="subtitle">대출이 궁금하신가요? 잘 오셨습니다.</p>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="#calculator">계산기</a></li>
+                        <li><a href="#guide">이용안내</a></li>
+                        <li><a href="#info">대출정보</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main">
+        <div class="container">
+            <!-- 계산기 섹션 -->
+            <section id="calculator" class="calculator-section">
+                <div class="calculator-container">
+                    <!-- 대출 입력 패널 -->
+                    <div class="input-panel">
+                        <h3>대출 조건 입력</h3>
+                        <form id="loanForm" class="loan-form">
+                            <div class="form-group">
+                                <label for="principal">대출 원금 (원)</label>
+                                <input type="text" id="principal" name="principal" placeholder="예: 100,000,000" required>
+                                <small class="help-text">대출받을 금액을 입력하세요</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="annual_rate">연이율 (%)</label>
+                                <input type="number" id="annual_rate" name="annual_rate" step="0.01" min="0" max="30" placeholder="예: 3.5" required>
+                                <small class="help-text">연단위 이자율을 입력하세요</small>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="years">대출기간 (년)</label>
+                                    <input type="number" id="years" name="years" min="0" max="50" placeholder="예: 20">
+                                    <small class="help-text">년 단위</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="months">추가 개월</label>
+                                    <input type="number" id="months" name="months" min="0" max="11" placeholder="예: 6">
+                                    <small class="help-text">월 단위</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="payment_type">상환 방식</label>
+                                <select id="payment_type" name="payment_type" required>
+                                    <option value="equal_payment">원리금 균등상환</option>
+                                    <option value="equal_principal">원금 균등상환</option>
+                                    <option value="maturity_payment">만기일시상환</option>
+                                    <option value="step_up_payment">체증식 상환</option>
+                                </select>
+                                <small class="help-text">상환 방식을 선택하세요</small>
+                            </div>
+
+                            <div class="form-group" id="stepRateGroup" style="display: none;">
+                                <label for="step_rate">체증률 (%)</label>
+                                <input type="number" id="step_rate" name="step_rate" min="1" max="20" value="5" placeholder="예: 5">
+                                <small class="help-text">매년 상환액 증가율</small>
+                            </div>
+
+                            <button type="submit" class="calculate-btn">
+                                <span class="btn-icon">🧮</span>
+                                계산하기
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- 신용점수 기반 금리 계산 패널 -->
+                    <div class="credit-panel">
+                        <h3>예상 금리 계산</h3>
+                        <form id="creditForm" class="credit-form">
+                            <div class="form-group">
+                                <label for="credit_score">신용점수</label>
+                                <input type="number" id="credit_score" name="credit_score" min="300" max="999" placeholder="예: 750">
+                                <small class="help-text">개인신용평점을 입력하세요 (300~999)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="loan_type">대출 종류</label>
+                                <select id="loan_type" name="loan_type">
+                                    <option value="mortgage">주택담보대출</option>
+                                    <option value="personal">신용대출</option>
+                                    <option value="auto">자동차대출</option>
+                                    <option value="business">사업자대출</option>
+                                </select>
+                                <small class="help-text">대출 종류에 따라 금리가 달라집니다</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="income">연소득 (만원)</label>
+                                <input type="number" id="income" name="income" min="0" placeholder="예: 5000">
+                                <small class="help-text">세전 연소득을 입력하세요</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="employment_type">근무형태</label>
+                                <select id="employment_type" name="employment_type">
+                                    <option value="regular">정규직</option>
+                                    <option value="contract">계약직</option>
+                                    <option value="freelance">프리랜서</option>
+                                    <option value="business">사업자</option>
+                                </select>
+                                <small class="help-text">근무형태에 따라 금리가 조정됩니다</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <span class="btn-icon">📊</span>
+                                금리 계산
+                            </button>
+                        </form>
+
+                        <!-- 신용점수 계산 결과 -->
+                        <div class="credit-result" id="creditResult" style="display: none;">
+                            <h4>예상 금리</h4>
+                            <div class="rate-display">
+                                <span class="rate-label">예상 금리:</span>
+                                <span class="rate-value" id="estimatedRate">-</span>
+                            </div>
+                            <div class="rate-range" id="rateRange">-</div>
+                            <div class="credit-grade" id="creditGrade">-</div>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="applyCreditRate()">
+                                <span class="btn-icon">📋</span>
+                                금리 적용
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 결과 패널 -->
+                    <div class="result-panel" id="resultPanel" style="display: none;">
+                        <h3>계산 결과</h3>
+                        <div class="result-summary" id="resultSummary">
+                            <!-- 결과 요약이 여기에 표시됩니다 -->
+                        </div>
+                        
+                        <div class="result-actions">
+                            <button type="button" class="btn btn-secondary" onclick="toggleSchedule()">
+                                <span class="btn-icon">📋</span>
+                                상환 계획표 보기
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="printResult()">
+                                <span class="btn-icon">🖨️</span>
+                                인쇄하기
+                            </button>
+                        </div>
+
+                        <!-- 상환 계획표 -->
+                        <div class="schedule-container" id="scheduleContainer" style="display: none;">
+                            <h4>월별 상환 계획표</h4>
+                            <div class="table-responsive">
+                                <table class="schedule-table" id="scheduleTable">
+                                    <!-- 테이블 내용이 JavaScript로 생성됩니다 -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 은행 바로가기 섹션 -->
+            <section class="bank-links-section">
+                <h3>주요 은행 바로가기</h3>
+                <p class="bank-subtitle">각 은행의 공식 홈페이지를 확인해보세요</p>
+                <div class="bank-grid">
+                    <a href="https://www.wooribank.com" target="_blank" class="bank-card" rel="noopener">
+                        <div class="bank-logo">🔷</div>
+                        <div class="bank-info">
+                            <h4>우리은행</h4>
+                        </div>
+                    </a>
+                    <a href="https://www.nonghyup.com" target="_blank" class="bank-card" rel="noopener">
+                        <div class="bank-logo">🟢</div>
+                        <div class="bank-info">
+                            <h4>농협은행</h4>
+                        </div>
+                    </a>
+                    <a href="https://www.shinhan.com" target="_blank" class="bank-card" rel="noopener">
+                        <div class="bank-logo">🔵</div>
+                        <div class="bank-info">
+                            <h4>신한은행</h4>
+                        </div>
+                    </a>
+                    <a href="https://www.kbstar.com" target="_blank" class="bank-card" rel="noopener">
+                        <div class="bank-logo">🟡</div>
+                        <div class="bank-info">
+                            <h4>KB국민은행</h4>
+                        </div>
+                    </a>
+                    <a href="https://www.kebhana.com" target="_blank" class="bank-card" rel="noopener">
+                        <div class="bank-logo">🟠</div>
+                        <div class="bank-info">
+                            <h4>하나은행</h4>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 이용안내 섹션 -->
+            <section id="guide" class="guide-section">
+                <h3>상환 방식별 특징</h3>
+                <div class="guide-grid">
+                    <div class="guide-card">
+                        <h4>원리금 균등상환</h4>
+                        <p>매월 동일한 금액을 상환하는 방식으로, 상환 계획을 세우기 쉽습니다.</p>
+                        <ul>
+                            <li>월 상환액 일정</li>
+                            <li>계획적인 상환</li>
+                            <li>가장 일반적인 방식</li>
+                        </ul>
+                    </div>
+                    <div class="guide-card">
+                        <h4>원금 균등상환</h4>
+                        <p>매월 동일한 원금을 상환하여 시간이 지날수록 이자 부담이 줄어듭니다.</p>
+                        <ul>
+                            <li>초기 상환액 높음</li>
+                            <li>총 이자 부담 적음</li>
+                            <li>시간에 따라 상환액 감소</li>
+                        </ul>
+                    </div>
+                    <div class="guide-card">
+                        <h4>만기일시상환</h4>
+                        <p>대출 기간 중에는 이자만 납부하고, 만기에 원금을 일시 상환합니다.</p>
+                        <ul>
+                            <li>월 상환 부담 최소</li>
+                            <li>만기 시 큰 금액 필요</li>
+                            <li>단기 자금 운용에 적합</li>
+                        </ul>
+                    </div>
+                    <div class="guide-card">
+                        <h4>체증식 상환</h4>
+                        <p>초기에는 적은 금액으로 시작하여 시간이 지날수록 상환액이 증가합니다.</p>
+                        <ul>
+                            <li>초기 부담 적음</li>
+                            <li>소득 증가 예상자에게 적합</li>
+                            <li>장기적 계획 필요</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>서비스 정보</h4>
+                    <ul>
+                        <li><a href="#">이용약관</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">서비스 소개</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>고객지원</h4>
+                    <ul>
+                        <li><a href="#">자주묻는질문</a></li>
+                        <li><a href="#">문의하기</a></li>
+                        <li><a href="#">신고센터</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>관련 기관</h4>
+                    <ul>
+                        <li><a href="https://www.fss.or.kr" target="_blank" rel="noopener">금융감독원</a></li>
+                        <li><a href="https://www.bok.or.kr" target="_blank" rel="noopener">한국은행</a></li>
+                        <li><a href="https://www.kdic.or.kr" target="_blank" rel="noopener">예금보험공사</a></li>
+                        <li><a href="https://www.hf.go.kr" target="_blank" rel="noopener">주택도시기금</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 대출 이자 계산기. 모든 권리 보유.</p>
+                <p class="disclaimer">본 계산기는 참고용이며, 실제 대출 조건은 금융기관에 문의하시기 바랍니다.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 로딩 및 에러 모달 -->
+    <div id="loadingModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <p>계산 중입니다...</p>
+        </div>
+    </div>
+
+    <div id="errorModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h4>오류 발생</h4>
+            <p id="errorMessage">오류가 발생했습니다.</p>
+            <button type="button" class="btn btn-primary" onclick="closeErrorModal()">확인</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

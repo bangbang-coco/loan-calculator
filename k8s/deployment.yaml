@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: loan-calculator
-        image: loan-calculator:latest
-        imagePullPolicy: IfNotPresent
+        image: hyomin/loan-calculator:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         resources:

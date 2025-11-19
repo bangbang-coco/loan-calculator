@@ -11,11 +11,10 @@
 
 ### 1.2 이미지 태그 설정
 로컬 이미지를 Docker Hub 사용자 이름과 매칭되도록 태그를 지정합니다.
-(`your-username`을 실제 Docker Hub 아이디로 변경하세요)
 
 ```bash
 # 형식: docker tag [로컬이미지명] [사용자명]/[이미지명]:[태그]
-docker tag loan-calculator:latest your-username/loan-calculator:latest
+docker tag loan-calculator:latest hyomin/loan-calculator:latest
 ```
 
 ### 1.3 Docker Hub 로그인
@@ -30,7 +29,7 @@ docker login
 이미지를 Docker Hub로 전송합니다.
 
 ```bash
-docker push your-username/loan-calculator:latest
+docker push hyomin/loan-calculator:latest
 ```
 
 ---
@@ -41,13 +40,13 @@ Docker가 설치된 다른 서버에서 이미지를 받아 실행하는 방법�
 
 ### 2.1 이미지 다운로드 (Pull)
 ```bash
-docker pull your-username/loan-calculator:latest
+docker pull hyomin/loan-calculator:latest
 ```
 
 ### 2.2 컨테이너 실행
 ```bash
 # 8080 포트로 실행 (포트 충돌 방지)
-docker run -d -p 8080:5000 --name loan-app your-username/loan-calculator:latest
+docker run -d -p 8080:5000 --name loan-app hyomin/loan-calculator:latest
 ```
 
 ---
@@ -73,7 +72,7 @@ Kubernetes 클러스터에 배포하려면 매니페스트 파일을 수정하�
     spec:
       containers:
       - name: loan-calculator
-        image: your-username/loan-calculator:latest  # Docker Hub 이미지
+        image: hyomin/loan-calculator:latest  # Docker Hub 이미지
         imagePullPolicy: Always
 ```
 

@@ -65,35 +65,71 @@
    http://127.0.0.1:5000
    ```
 
-## � Docker 및 Kubernetes 배포
+## 🐳 배포 가이드 (Deployment Guide)
 
-### Docker 이미지 빌드 및 실행
+이 문서는 로컬에서 빌드한 `loan-calculator` 컨테이너 이미지를 다른 서버나 Kubernetes 클러스터에 배포하는 방법을 설명합니다.
 
-1. **이미지 빌드**
-   ```bash
-   docker build -t loan-calculator:latest .
-   ```
+### 1. Docker로 실행하기
 
-2. **컨테이너 실행**
-   ```bash
-   docker run -p 5000:5000 loan-calculator:latest
-   ```
+Docker가 설치된 다른 서버에서 이미지를 받아 실행하는 방법입니다.
 
-### Kubernetes 배포
+#### 1.1 이미지 다운로드 (Pull)
+```bash
+docker pull hyomin/loan-calculator:latest
+```
 
-1. **매니페스트 적용**
-   ```bash
-   kubectl apply -f k8s/deployment.yaml
-   kubectl apply -f k8s/service.yaml
-   ```
+#### 1.2 컨테이너 실행
+```bash
+# 8080 포트로 실행 (포트 충돌 방지)
+docker run -d -p 8080:5000 --name loan-app hyomin/loan-calculator:latest
+```
 
-2. **배포 확인**
-   ```bash
-   kubectl get pods
-   kubectl get svc
-   ```
+### 2. Kubernetes(K8S)에 배포하기
 
-## �🛠️ 기술 스택
+Kubernetes 클러스터에 배포하려면 매니페스트 파일을 수정하여 Docker Hub 이미지를 사용하도록 설정해야 합니다.
+
+#### 2.1 deployment.yaml 수정
+`k8s/deployment.yaml` 파일에서 `image` 부분을 수정합니다.
+
+**변경 전:**
+```yaml
+    spec:
+      containers:
+      - name: loan-calculator
+        image: loan-calculator:latest  # 로컬 이미지
+        imagePullPolicy: IfNotPresent
+```
+
+**변경 후:**
+```yaml
+    spec:
+      containers:
+      - name: loan-calculator
+        image: hyomin/loan-calculator:latest  # Docker Hub 이미지
+        imagePullPolicy: Always
+```
+
+#### 2.2 배포 적용
+kubectl 명령어로 클러스터에 배포합니다.
+
+```bash
+# 배포 생성/업데이트
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+# 상태 확인
+kubectl get pods
+kubectl get svc
+```
+
+#### 2.3 서비스 접속
+`LoadBalancer` 타입의 서비스인 경우, 할당된 `EXTERNAL-IP`를 확인하여 접속합니다.
+
+```bash
+kubectl get svc loan-calculator-service
+```
+
+## 🛠️ 기술 스택
 
 ### Backend
 - **Flask**: Python 웹 프레임워크

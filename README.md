@@ -38,7 +38,7 @@
 
 1. **저장소 클론**
    ```bash
-   git clone https://github.com/your-username/loan-calculator.git
+   git clone https://github.com/bangbang-coco/loan-calculator.git
    cd loan-calculator
    ```
 
@@ -65,7 +65,35 @@
    http://127.0.0.1:5000
    ```
 
-## 🛠️ 기술 스택
+## � Docker 및 Kubernetes 배포
+
+### Docker 이미지 빌드 및 실행
+
+1. **이미지 빌드**
+   ```bash
+   docker build -t loan-calculator:latest .
+   ```
+
+2. **컨테이너 실행**
+   ```bash
+   docker run -p 5000:5000 loan-calculator:latest
+   ```
+
+### Kubernetes 배포
+
+1. **매니페스트 적용**
+   ```bash
+   kubectl apply -f k8s/deployment.yaml
+   kubectl apply -f k8s/service.yaml
+   ```
+
+2. **배포 확인**
+   ```bash
+   kubectl get pods
+   kubectl get svc
+   ```
+
+## �🛠️ 기술 스택
 
 ### Backend
 - **Flask**: Python 웹 프레임워크

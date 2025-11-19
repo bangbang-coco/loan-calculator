@@ -79,6 +79,12 @@
 #### 1.2 이미지 태그 설정
 로컬 이미지를 Docker Hub 사용자 이름과 매칭되도록 태그를 지정합니다.
 
+> **주의**: Mac(Apple Silicon) 사용자는 Linux 서버 배포를 위해 `--platform linux/amd64` 옵션을 사용하여 다시 빌드해야 합니다.
+> ```bash
+> docker build --platform linux/amd64 -t hyomin/loan-calculator:latest .
+> ```
+
+기존 이미지를 태그하는 경우:
 ```bash
 # 형식: docker tag [로컬이미지명] [사용자명]/[이미지명]:[태그]
 docker tag loan-calculator:latest hyomin/loan-calculator:latest
